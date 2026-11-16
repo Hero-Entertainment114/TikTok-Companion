@@ -57,14 +57,14 @@ Cần JDK 17, Android SDK Platform 35, Build Tools 35.0.0 và kết nối Intern
 - JDK: 17
 - compileSdk / targetSdk: 35
 - minSdk: 26 (Android 8.0)
-- versionCode: 2
-- versionName: 0.2.0
+- versionCode: 3
+- versionName: 0.2.1
 
 Bản build mặc định là **debug APK**, không phải bản release được ký bằng khóa phát hành riêng.
 
 ## Kiểm thử thủ công
 
-- Cài v0.2.0 đè lên v0.1.0 (giữ cùng application ID trên bản release/debug tương ứng); xác nhận dữ liệu kho và bản nháp cũ còn nguyên.
+- Cài v0.2.1 đè lên bản 0.2.0 hoặc v0.1.0 (giữ cùng application ID trên bản release/debug tương ứng); xác nhận dữ liệu kho và bản nháp cũ còn nguyên.
 - Bật Notification Access, gửi thông báo TikTok mới và xác nhận nội dung xuất hiện trong Vault.
 - Gõ từ khóa tìm kiếm; xác nhận kết quả lọc theo người gửi/nội dung/ghi chú.
 - Tạo banner với từng bảng màu; xuất PNG; chọn một ứng dụng nhận ảnh từ bảng chia sẻ và xác nhận ảnh mở được.
@@ -92,3 +92,8 @@ app/src/main/
       TikTokNotificationListener.kt
   res/values/
 ```
+
+
+### v0.2.1 build-fix
+
+This maintenance release fixes Kotlin compilation errors in the view setup and quick-reply notification action builder. The GitHub Actions workflow remains the same; run **Build TikTok Companion APK** again after replacing the repository contents with this archive.

@@ -6,7 +6,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.RemoteInput
 import android.content.pm.PackageManager
-import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
 import android.service.notification.NotificationListenerService
@@ -91,8 +90,11 @@ class TikTokNotificationListener : NotificationListenerService() {
         originalInput.extras?.let { inputBuilder.addExtras(it) }
         val replyInput = inputBuilder.build()
 
+        // Notification.Action exposes the legacy resource ID as an Int. Use the Int
+        // constructor here; passing an Icon fallback to this overload causes a type error.
+        val actionIconRes = action.icon.takeIf { it != 0 } ?: android.R.drawable.sym_action_chat
         val replyAction = Notification.Action.Builder(
-            action.icon ?: Icon.createWithResource(this, android.R.drawable.sym_action_chat),
+            actionIconRes,
             "Trả lời chuỗi",
             action.actionIntent
         )

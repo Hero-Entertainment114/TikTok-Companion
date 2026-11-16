@@ -12,3 +12,11 @@
 ## 0.1.0
 
 - Initial notification vault, local drafts, notes, private presentation edits and AES-GCM encryption.
+
+
+## 0.2.1 — Android build fix
+
+- Fixed `ScrollView` viewport configuration by calling `setFillViewport(true)`.
+- Fixed `EditText` single-line configuration by calling `setSingleLine(true)`.
+- Fixed quick-reply notification action construction to use the `Int` icon-resource constructor of `Notification.Action.Builder`.
+- Bumped Android `versionCode` to 3 and `versionName` to 0.2.1.
