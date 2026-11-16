@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TikTok Companion</string>
+    <string name="notification_listener_label">TikTok Companion notification access</string>
+</resources>
