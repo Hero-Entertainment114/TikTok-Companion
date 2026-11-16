@@ -103,7 +103,7 @@ class MainActivity : Activity() {
         root.addView(navScroll)
 
         val scroll = ScrollView(this).apply {
-            fillViewport = true
+            setFillViewport(true)
             overScrollMode = View.OVER_SCROLL_NEVER
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
         }
@@ -331,7 +331,7 @@ class MainActivity : Activity() {
             hint = "Tên / người nhận (chỉ để bạn phân loại)"
             setText(existing?.title.orEmpty())
             textSize = 14f
-            singleLine = true
+            setSingleLine(true)
         }
         val body = EditText(this).apply {
             hint = "Soạn nội dung tin nhắn…"
