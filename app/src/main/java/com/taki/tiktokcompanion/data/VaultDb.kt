@@ -33,10 +33,23 @@ class VaultDb(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VE
         )
         db.execSQL("CREATE INDEX idx_messages_created ON messages(created_at DESC)")
         db.execSQL("CREATE INDEX idx_drafts_updated ON drafts(updated_at DESC)")
+        createStreakSettingsTable(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // v0.1.0 is the first schema. Future upgrades must preserve encrypted records.
+        // Preserve the existing encrypted vault and drafts while adding new settings.
+        if (oldVersion < 2) createStreakSettingsTable(db)
+    }
+
+    private fun createStreakSettingsTable(db: SQLiteDatabase) {
+        db.execSQL(
+            """CREATE TABLE IF NOT EXISTS streak_settings (
+                id INTEGER PRIMARY KEY CHECK(id = 1),
+                enabled INTEGER NOT NULL DEFAULT 0,
+                trigger_cipher TEXT NOT NULL,
+                reply_cipher TEXT NOT NULL
+            )""".trimIndent()
+        )
     }
 
     @Synchronized
@@ -138,6 +151,35 @@ class VaultDb(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VE
         writableDatabase.delete("messages", null, null)
     }
 
+    @Synchronized
+    fun getStreakSettings(): StreakSettings {
+        readableDatabase.query(
+            "streak_settings", null, "id=1", null, null, null, null
+        ).use { cursor ->
+            if (cursor.moveToFirst()) {
+                return StreakSettings(
+                    enabled = cursor.getInt(cursor.getColumnIndexOrThrow("enabled")) == 1,
+                    trigger = crypto.decrypt(cursor.getString(cursor.getColumnIndexOrThrow("trigger_cipher"))),
+                    replyTemplate = crypto.decrypt(cursor.getString(cursor.getColumnIndexOrThrow("reply_cipher")))
+                )
+            }
+        }
+        return StreakSettings(enabled = false, trigger = "🔥", replyTemplate = "🔥 Giữ chuỗi thôi!")
+    }
+
+    @Synchronized
+    fun saveStreakSettings(settings: StreakSettings) {
+        val values = ContentValues().apply {
+            put("id", 1)
+            put("enabled", if (settings.enabled) 1 else 0)
+            put("trigger_cipher", crypto.encrypt(settings.trigger.trim()))
+            put("reply_cipher", crypto.encrypt(settings.replyTemplate.trim()))
+        }
+        writableDatabase.insertWithOnConflict(
+            "streak_settings", null, values, SQLiteDatabase.CONFLICT_REPLACE
+        )
+    }
+
     private fun sha256(value: String): String {
         val bytes = MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8))
         return bytes.joinToString("") { "%02x".format(it) }
@@ -145,6 +187,6 @@ class VaultDb(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VE
 
     companion object {
         private const val DB_NAME = "private_vault.db"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
     }
 }

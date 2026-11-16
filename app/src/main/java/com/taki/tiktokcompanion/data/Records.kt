@@ -20,3 +20,9 @@ data class DraftRecord(
     val createdAt: Long,
     val updatedAt: Long
 )
+
+data class StreakSettings(
+    val enabled: Boolean,
+    val trigger: String,
+    val replyTemplate: String
+)

@@ -1,76 +1,89 @@
-# TikTok Companion v0.1.0
+# TikTok Companion v0.2.0
 
-Ứng dụng Android native (Kotlin) để lưu văn bản hiển thị trong thông báo TikTok, đọc lại trong kho cục bộ, tạo bản nháp, và ghi chú/chỉnh sửa **bản hiển thị riêng**.
+Ứng dụng Android native (Kotlin) hỗ trợ quản lý nội dung TikTok mà Android thực sự đưa vào thông báo, soạn nháp, tạo ảnh banner để chia sẻ và trả lời nhanh có xác nhận của người dùng.
 
-## Có gì trong bản này
+## Tính năng mới trong v0.2.0
 
-- **Notification Vault:** nhận thông báo mới từ hai package TikTok được cấu hình trong `TikTokNotificationListener` (`com.zhiliaoapp.musically`, `com.ss.android.ugc.trill`).
-- **Private Reading:** xem lại nội dung đã lưu trong ứng dụng Companion mà không mở cuộc trò chuyện TikTok.
-- **Private Drafts:** tạo/sửa/xóa bản nháp; sao chép hoặc chia sẻ văn bản để người dùng tự dán vào TikTok.
-- **Local Presentation Editor:** lưu một bản hiển thị đã chỉnh và ghi chú riêng, đồng thời giữ nguyên văn bản gốc.
-- **Encryption at rest:** các trường nội dung được mã hóa AES-GCM; khóa AES được giữ trong Android Keystore.
-- **No network permission:** manifest không khai báo `INTERNET`; dữ liệu không được gửi đến máy chủ của dự án.
+- **Banner Studio:** tạo banner PNG 1440 × 560, nhập tiêu đề/mô tả/tên, chọn 4 tông màu, xem trước và mở bảng chia sẻ Android. Có thể chọn TikTok nếu phiên bản ứng dụng trên máy hỗ trợ nhận ảnh được chia sẻ. Người khác chỉ nhìn thấy banner sau khi bạn chủ động đăng/gửi.
+- **Gợi ý trả lời chuỗi:** cấu hình từ khóa (mặc định 🔥) và câu trả lời mẫu. Khi thông báo TikTok khớp từ khóa và thông báo gốc có hành động trả lời nhanh `RemoteInput`, Companion tạo một thông báo có nút **Trả lời chuỗi**. Người dùng phải bấm nút, có thể sửa nội dung và xác nhận gửi.
+- **Tìm kiếm kho thông báo:** lọc theo tên, văn bản, bản hiển thị đã chỉnh hoặc ghi chú.
+- **Mở TikTok nhanh:** thêm nút mở ứng dụng từ thẻ thông báo, bản nháp và Banner Studio.
+- **Nâng cấp bản nháp:** tiếp tục sửa, sao chép, chia sẻ hoặc mở TikTok để tự dán/gửi.
+- **Nâng cấp cơ sở dữ liệu:** schema v2 thêm cấu hình trả lời nhanh mã hóa; giữ nguyên thông báo, bản nháp và ghi chú đã lưu từ v0.1.0.
 
-## Giới hạn cố ý
+## Tính năng sẵn có được giữ lại
 
-1. Android chỉ chuyển cho ứng dụng nội dung mà TikTok thực sự đưa vào thông báo. Nếu xem trước thông báo bị tắt/ẩn, thông báo không có văn bản, TikTok không phát thông báo, hoặc tin nhắn bị thu hồi trước khi nội dung được nhận, ứng dụng không thể phục hồi nội dung đó.
-2. Notification Listener có thể thấy các loại thông báo TikTok khác ngoài DM. V0.1.0 lưu văn bản thông báo hiển thị; không tuyên bố phân loại DM chính xác tuyệt đối.
-3. Đọc lại trong Companion không mở TikTok, nên thao tác này không tự phát sinh trạng thái đã xem bên trong TikTok. Ứng dụng không điều khiển trạng thái đọc của TikTok và không bảo đảm các thao tác khác trong TikTok sẽ không gửi trạng thái đó.
-4. Chỉnh sửa là bản hiển thị riêng trong Companion. Không có thay đổi nào được gửi đến máy chủ TikTok hoặc thiết bị người khác.
-5. Bản nháp được lưu ngoại tuyến. Sao chép/chia sẻ không tự gửi tin nhắn.
+- **Notification Vault:** nhận thông báo từ hai package TikTok được cấu hình (`com.zhiliaoapp.musically`, `com.ss.android.ugc.trill`).
+- **Private Reading:** đọc lại nội dung đã lưu trong Companion.
+- **Private Drafts:** tạo/sửa/xóa bản nháp; sao chép/chia sẻ văn bản.
+- **Local Presentation Editor:** lưu một bản hiển thị đã chỉnh và ghi chú riêng; văn bản gốc không bị thay đổi.
+- **Encryption at rest:** nội dung thông báo, bản nháp và cấu hình trả lời nhanh được mã hóa AES-GCM; khóa nằm trong Android Keystore.
+- **No network permission:** manifest không khai báo `INTERNET`; dữ liệu của ứng dụng không được gửi đến máy chủ dự án.
+
+## Giới hạn quan trọng
+
+1. **Banner không sửa trực tiếp hồ sơ TikTok.** Banner Studio tạo một ảnh độc lập để đăng/gửi; người khác sẽ thấy sau khi bạn chia sẻ ảnh đó. Tài liệu trợ giúp hồ sơ TikTok hiện mô tả luồng đổi ảnh/video hồ sơ, không phải một API đặt banner của ứng dụng bên thứ ba.
+2. **Không tự gửi tin nhắn âm thầm.** Tính năng Chuỗi không tự động gửi tin nhắn. Nó chỉ tái sử dụng hành động trả lời nhanh mà chính thông báo TikTok cung cấp. Nếu TikTok không đưa `RemoteInput` vào thông báo, nút không xuất hiện. Người dùng vẫn phải nhấn và xác nhận gửi. Mỗi người gửi chỉ nhận tối đa một gợi ý trong 30 phút để tránh thông báo lặp.
+3. **Không điều khiển giao diện riêng của TikTok.** Các nút mở TikTok chỉ khởi chạy ứng dụng; sao chép/chia sẻ không tự chọn người nhận hoặc gửi tin nhắn.
+4. **Không sửa dữ liệu máy chủ hoặc gói tin.** Companion không chặn lưu lượng, giả mạo phản hồi, thay đổi lượt thích/người theo dõi/trạng thái chuỗi, hoặc thay đổi dữ liệu hiển thị trên máy chủ TikTok. Bản hiển thị đã chỉnh trong kho vẫn là bản riêng trên thiết bị.
+5. Android chỉ chuyển cho ứng dụng nội dung mà TikTok thực sự đưa vào thông báo. Nếu xem trước bị ẩn, thông báo không có văn bản, TikTok không phát thông báo, hoặc nội dung bị thu hồi trước khi nhận, ứng dụng không thể phục hồi nội dung đó.
+6. Notification Listener có thể thấy những loại thông báo TikTok ngoài DM. V0.2.0 không tuyên bố phân loại DM/chuỗi chính xác tuyệt đối; điều kiện từ khóa chỉ là bộ lọc đơn giản trên phần văn bản nhìn thấy.
 
 ## Quyền cần bật trên điện thoại
 
-1. Cài ứng dụng.
-2. Mở TikTok Companion → **Kho lưu trữ** → **Bật quyền đọc thông báo**.
+1. Cài ứng dụng và mở TikTok Companion.
+2. Vào **Kho lưu trữ** → **Bật quyền đọc thông báo**.
 3. Trong trang Android **Notification access / Quyền truy cập thông báo**, bật TikTok Companion và xác nhận.
-4. Đảm bảo thông báo TikTok đang bật và nội dung xem trước thông báo được phép hiển thị. Gửi thử một tin nhắn mới để kiểm tra.
+4. Để dùng gợi ý trả lời chuỗi trên Android 13 trở lên, mở tab **Chuỗi** và cấp quyền thông báo cho Companion.
+5. Đảm bảo thông báo TikTok đang bật và nội dung xem trước thông báo được phép hiển thị.
 
-Quyền Notification Access là quyền nhạy cảm: Android sẽ cho phép ứng dụng đọc nội dung thông báo của các package mà listener chấp nhận. Mã nguồn hiện chỉ chấp nhận các package TikTok được liệt kê. Không bật quyền này cho APK không rõ nguồn gốc.
+Quyền Notification Access rất nhạy cảm: Android cho phép listener đọc nội dung thông báo từ những package mà listener chấp nhận. Chỉ cài APK từ nguồn bạn tin cậy.
 
-## Build
+## Build APK
 
-### Cách dễ nhất: GitHub Actions (không cần Android Studio trên PC)
+### GitHub Actions
 
-Project có sẵn workflow tại `.github/workflows/build-apk.yml`. Đưa **toàn bộ nội dung** thư mục project lên root của một GitHub repository, commit lên nhánh `main`, rồi mở tab Actions. Workflow sẽ tự build APK trên máy chủ GitHub và tải kết quả dưới mục Artifacts. Hướng dẫn từng bước nằm trong [BUILD-GITHUB.md](BUILD-GITHUB.md).
+Project có workflow `.github/workflows/build-apk.yml`. Đưa toàn bộ nội dung thư mục project lên root của GitHub repository, commit lên nhánh `main`, sau đó mở **Actions**. Workflow sẽ tạo debug APK và lưu artifact `TikTokCompanion-debug-apk`.
 
-### Build trực tiếp trên PC bằng command line
+### Build trên Windows
 
-Không cần Android Studio, nhưng cần JDK 17, Android SDK Command-line Tools, Android SDK Platform 35, Build Tools 35.0.0 và Gradle 8.9. Sau khi cài và cấu hình `ANDROID_HOME`/`ANDROID_SDK_ROOT`, chạy:
+Cần JDK 17, Android SDK Platform 35, Build Tools 35.0.0 và kết nối Internet cho lần tải Gradle/plugin đầu tiên. Chạy `build-debug.ps1` hoặc `build-debug.bat`; APK dự kiến ở `app/build/outputs/apk/debug/app-debug.apk`.
 
-```powershell
-gradle :app:assembleDebug
-```
+### Cấu hình build
 
-### Yêu cầu nếu dùng Android Studio
+- Android Gradle Plugin: 8.7.3
+- Kotlin plugin: 2.0.21
+- Gradle: 8.9
+- JDK: 17
+- compileSdk / targetSdk: 35
+- minSdk: 26 (Android 8.0)
+- versionCode: 2
+- versionName: 0.2.0
 
-- Android Studio phiên bản có hỗ trợ Android Gradle Plugin 8.7.3.
-- JDK 17 trở lên.
-- Android SDK Platform 35 và Build Tools tương ứng.
-- Gradle 8.9 (Android Studio có thể tải/cài khi đồng bộ project).
+Bản build mặc định là **debug APK**, không phải bản release được ký bằng khóa phát hành riêng.
 
-### Build bằng Android Studio
+## Kiểm thử thủ công
 
-1. Mở thư mục `TikTokCompanion` bằng Android Studio.
-2. Chọn **Sync Project with Gradle Files**.
-3. Hoặc chạy `build-debug.bat` trên Windows. Script sẽ tìm Android SDK, tải Gradle 8.9 nếu chưa có, tạo Gradle Wrapper chuẩn và build APK debug.
-4. APK debug dự kiến ở `app/build/outputs/apk/debug/app-debug.apk`.
+- Cài v0.2.0 đè lên v0.1.0 (giữ cùng application ID trên bản release/debug tương ứng); xác nhận dữ liệu kho và bản nháp cũ còn nguyên.
+- Bật Notification Access, gửi thông báo TikTok mới và xác nhận nội dung xuất hiện trong Vault.
+- Gõ từ khóa tìm kiếm; xác nhận kết quả lọc theo người gửi/nội dung/ghi chú.
+- Tạo banner với từng bảng màu; xuất PNG; chọn một ứng dụng nhận ảnh từ bảng chia sẻ và xác nhận ảnh mở được.
+- Bật gợi ý chuỗi với từ khóa mà một thông báo thử nghiệm chứa. Kiểm tra nút chỉ xuất hiện nếu thông báo TikTok có sẵn hành động trả lời nhanh `RemoteInput`; bấm thử và xác nhận Android/TikTok mở giao diện nhập nội dung trước khi gửi.
+- Tắt gợi ý chuỗi; xác nhận không còn thông báo Companion được tạo cho những thông báo khớp.
+- Tạo/sửa/sao chép/chia sẻ/xóa bản nháp.
+- Chỉnh bản hiển thị và ghi chú; xác nhận văn bản gốc không đổi.
+- Xác nhận app hoạt động khi không có kết nối Internet.
 
-Có thể build thủ công trong terminal khi đã cài Gradle và Android SDK:
-
-```bash
-gradle :app:assembleDebug
-```
-
-Project dùng Android framework APIs, không cần thư viện UI bên thứ ba. Môi trường tạo project không có Android SDK/Gradle và không truy cập được máy chủ tải dependency, vì vậy APK chưa được biên dịch hoặc chạy trên thiết bị tại đây. Script build cần kết nối Internet ở lần tải Gradle/plugin đầu tiên. Cần build và smoke-test trên Android Studio/thiết bị thật trước khi phát hành.
-
-## Cấu trúc
+## Cấu trúc chính
 
 ```text
 app/src/main/
   AndroidManifest.xml
   java/com/taki/tiktokcompanion/
     MainActivity.kt
+    banner/
+      BannerRenderer.kt
+      BannerFileProvider.kt
     data/
       CryptoBox.kt
       Records.kt
@@ -78,17 +91,4 @@ app/src/main/
     notify/
       TikTokNotificationListener.kt
   res/values/
-    strings.xml
-    styles.xml
 ```
-
-## Kiểm thử thủ công tối thiểu
-
-- Cài bản debug, mở quyền Notification Access, xác nhận trạng thái chuyển thành đã bật.
-- Gửi một thông báo TikTok có nội dung xem trước; xác nhận nó xuất hiện trong Kho lưu trữ.
-- Tắt xem trước nội dung thông báo; xác nhận ứng dụng không thể lưu phần văn bản bị ẩn.
-- Mở một mục, chỉnh bản hiển thị và thêm ghi chú; đóng/mở lại để xác nhận dữ liệu còn nguyên và văn bản gốc không đổi.
-- Tạo bản nháp, sửa, sao chép, chia sẻ và xóa.
-- Tắt Notification Access; xác nhận màn hình báo chưa bật quyền.
-- Xóa kho thông báo; xác nhận bản nháp không bị xóa.
-- Xác nhận ứng dụng hoạt động khi không có kết nối Internet.
